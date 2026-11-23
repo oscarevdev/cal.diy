@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { slugify } from "./slugify";
+import { slugify, slugifyWithMaxLength } from "./slugify";
 
 describe("slugify", () => {
   it("should convert to lowercase", () => {
@@ -58,5 +58,31 @@ describe("slugify", () => {
   it.skip("should remove unicode", () => {
     expect(slugify("Hello ®️ There")).toEqual("hello-there");
     expect(slugify("®️")).toEqual("");
+  });
+});
+
+describe("slugifyWithMaxLength", () => {
+  it("should slugify without truncating when within maxLength", () => {
+    expect(slugifyWithMaxLength("Hello There", 20)).toEqual("hello-there");
+    expect(slugifyWithMaxLength("Hello There", 11)).toEqual("hello-there");
+  });
+
+  it("should truncate to maxLength", () => {
+    expect(slugifyWithMaxLength("Hello There", 7)).toEqual("hello-t");
+  });
+
+  it("should not leave a trailing dash after truncation", () => {
+    expect(slugifyWithMaxLength("Hello There", 6)).toEqual("hello");
+    expect(slugifyWithMaxLength("hello & there", 6)).toEqual("hello");
+  });
+
+  it("should not leave a trailing period after truncation", () => {
+    expect(slugifyWithMaxLength("hello.there", 6)).toEqual("hello");
+  });
+
+  it("should return an empty string for empty input or non-positive maxLength", () => {
+    expect(slugifyWithMaxLength("", 10)).toEqual("");
+    expect(slugifyWithMaxLength("hello", 0)).toEqual("");
+    expect(slugifyWithMaxLength("hello", -1)).toEqual("");
   });
 });

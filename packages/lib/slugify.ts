@@ -28,4 +28,15 @@ export const slugify = (str: string, forDisplayingInput?: boolean) => {
   return forDisplayingInput ? s : s.replace(/-+$/, "").replace(/\.*$/, ""); // Remove dashes and period from end
 };
 
+export const slugifyWithMaxLength = (str: string, maxLength: number): string => {
+  if (maxLength <= 0) {
+    return "";
+  }
+
+  // Truncation can expose a separator that was mid-slug, so re-apply slugify's trailing cleanup
+  return slugify(str)
+    .slice(0, maxLength)
+    .replace(/[-.]+$/, "");
+};
+
 export default slugify;
