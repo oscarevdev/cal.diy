@@ -28,4 +28,10 @@ export const slugify = (str: string, forDisplayingInput?: boolean) => {
   return forDisplayingInput ? s : s.replace(/-+$/, "").replace(/\.*$/, ""); // Remove dashes and period from end
 };
 
+export const slugifyWithMaxLength = (str: string, maxLength: number): string => {
+  // Array.from splits by code point so truncation never cuts a surrogate pair in half
+  const truncated = Array.from(slugify(str)).slice(0, Math.max(0, maxLength)).join("");
+  return truncated.replace(/[-.]+$/, "");
+};
+
 export default slugify;

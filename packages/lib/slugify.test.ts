@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-
-import { slugify } from "./slugify";
+import { slugify, slugifyWithMaxLength } from "./slugify";
 
 describe("slugify", () => {
   it("should convert to lowercase", () => {
@@ -58,5 +57,34 @@ describe("slugify", () => {
   it.skip("should remove unicode", () => {
     expect(slugify("Hello ®️ There")).toEqual("hello-there");
     expect(slugify("®️")).toEqual("");
+  });
+});
+
+describe("slugifyWithMaxLength", () => {
+  it("slugifies strings shorter than maxLength without truncating", () => {
+    expect(slugifyWithMaxLength("Hello World", 20)).toEqual("hello-world");
+  });
+
+  it("truncates to maxLength", () => {
+    expect(slugifyWithMaxLength("Hello World", 7)).toEqual("hello-w");
+  });
+
+  it("does not leave a trailing dash after truncating", () => {
+    expect(slugifyWithMaxLength("Hello World", 6)).toEqual("hello");
+    expect(slugifyWithMaxLength("ab cd ef", 6)).toEqual("ab-cd");
+  });
+
+  it("does not leave a trailing period after truncating", () => {
+    expect(slugifyWithMaxLength("hello.world", 6)).toEqual("hello");
+  });
+
+  it("returns an empty string for empty input or non-positive maxLength", () => {
+    expect(slugifyWithMaxLength("", 10)).toEqual("");
+    expect(slugifyWithMaxLength("Hello", 0)).toEqual("");
+    expect(slugifyWithMaxLength("Hello", -1)).toEqual("");
+  });
+
+  it("does not split multi-code-unit characters", () => {
+    expect(slugifyWithMaxLength("𝒜𝒷𝒸", 2)).toEqual("𝒜𝒷");
   });
 });
